@@ -1,0 +1,59 @@
+C51 COMPILER V9.54   AT24C02                                                               11/25/2024 19:59:14 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE AT24C02
+OBJECT MODULE PLACED IN .\Objects\AT24C02.obj
+COMPILER INVOKED BY: E:\Keil5\C51\BIN\C51.EXE AT24C02.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\AT2
+                    -4C02.lst) OBJECT(.\Objects\AT24C02.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "I2C.h"
+   3          
+   4          #define uchar unsigned char
+   5          #define uint unsigned int
+   6          #define AT24C02_ADDRESS  0xA0
+   7          
+   8          void AT24C02_WriteByte(uchar WordAddress,Data)
+   9          {
+  10   1              I2C_Start();
+  11   1              I2C_SendByte(AT24C02_ADDRESS);
+  12   1              I2C_ReceiveAck();
+  13   1              I2C_SendByte(WordAddress);
+  14   1              I2C_ReceiveAck();
+  15   1              I2C_SendByte(Data);
+  16   1              I2C_ReceiveAck();
+  17   1              I2C_Stop();
+  18   1      }
+  19          
+  20          uchar AT24C02_ReadByte(uchar WordAddress)
+  21          {
+  22   1              uchar Data;
+  23   1              I2C_Start();
+  24   1              I2C_SendByte(AT24C02_ADDRESS);
+  25   1              I2C_ReceiveAck();
+  26   1              I2C_SendByte(WordAddress);
+  27   1              I2C_ReceiveAck();
+  28   1              I2C_Start();
+  29   1              I2C_SendByte(AT24C02_ADDRESS | 0x01);
+  30   1              I2C_ReceiveAck();
+  31   1              Data = I2C_ReceiveByte();
+  32   1              I2C_SendAck(1);
+  33   1              I2C_Stop();
+  34   1              return Data;
+  35   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     84    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       5
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
