@@ -1,0 +1,421 @@
+C51 COMPILER V9.54   MAIN                                                                  12/02/2024 15:55:47 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: E:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          #include "key_multi.h"
+   4          //#include "UART.h"
+   5          #include "AT24C02.h"
+   6          
+   7          #define uchar unsigned char
+   8          #define uint unsigned int
+   9          #define length 2
+  10          
+  11          sbit PWMOUT1 = P2^6;
+  12          sbit PWMOUT2 = P2^7;
+  13          
+  14          uchar f1,DR1,f2,DR2,i,state = 1,Loc,Num,t,p,count1,count2;                                                                      //f：频率  DR：占空比
+  15          uchar flag1,High1,Low1, flag3,High3,Low3, flag4,High4,Low4;
+  16          uchar display1[length],display2[length],str[10];
+  17          uchar HighRH1,HighRL1,LowRH1,LowRL1,HighRH2,HighRL2,LowRH2,LowRL2,mood1,mood2;
+  18          uint QS,HS,temp1,temp2,count;
+  19          
+  20          uchar code led_code[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
+  21          
+  22          void Timer0_Isr(void) interrupt 1
+  23          {       
+  24   1              if(mood1 == 0)
+  25   1              {
+  26   2                      if(PWMOUT1 == 1)
+  27   2                      {
+  28   3                              PWMOUT1 = 0;
+  29   3                              TH0 = LowRH1;                           
+  30   3                              TL0 = LowRL1;
+  31   3                      }
+  32   2                      else
+  33   2                      {
+  34   3                              PWMOUT1 = 1;
+  35   3                              TH0 = HighRH1;                          
+  36   3                              TL0 = HighRL1;
+  37   3                      }
+  38   2              }
+  39   1              else
+  40   1              {
+  41   2                      if(PWMOUT1 == 1)
+  42   2                      {
+  43   3                              if(count1 == 10)
+  44   3                              {
+  45   4                                      count1 = 0;
+  46   4                                      TH0 = LowRH1;                           
+  47   4                                      TL0 = LowRL1;
+  48   4                                      PWMOUT1 = 0;
+  49   4                              }
+  50   3                              else
+  51   3                              {
+  52   4                                      TH0 = HighRH1;                          
+  53   4                                      TL0 = HighRL1;
+  54   4                                      count1++;
+C51 COMPILER V9.54   MAIN                                                                  12/02/2024 15:55:47 PAGE 2   
+
+  55   4                              }
+  56   3                      }
+  57   2                      else
+  58   2                      {
+  59   3      
+  60   3                              if(count1 == 10)
+  61   3                              {
+  62   4                                      count1 = 0;
+  63   4                                      TH0 = HighRH1;                          
+  64   4                                      TL0 = HighRL1;
+  65   4                                      PWMOUT1 = 1;
+  66   4                              }
+  67   3                              else
+  68   3                              {
+  69   4                                      TH0 = LowRH1;                           
+  70   4                                      TL0 = LowRL1;
+  71   4                                      count1++;
+  72   4                              }
+  73   3                      }       
+  74   2              }
+  75   1      }
+  76          
+  77          void Timer1_Isr(void) interrupt 3
+  78          {
+  79   1              if(mood2 == 0)
+  80   1              {
+  81   2                              if(PWMOUT2 == 1)
+  82   2                              {
+  83   3                                      TH1 = LowRH2;                           
+  84   3                                      TL1 = LowRL2;
+  85   3                                      PWMOUT2 = 0;
+  86   3                              }
+  87   2                              else
+  88   2                              {
+  89   3                                      TH1 = HighRH2;                          
+  90   3                                      TL1 = HighRL2;
+  91   3                                      PWMOUT2 = 1;
+  92   3                              }
+  93   2              }
+  94   1              else
+  95   1              {
+  96   2                      if(PWMOUT2 == 1)
+  97   2                      {
+  98   3                              if(count2 == 10)
+  99   3                              {
+ 100   4                                      count2 = 0;
+ 101   4                                      TH0 = LowRH2;                           
+ 102   4                                      TL0 = LowRL2;
+ 103   4                                      PWMOUT2 = 0;
+ 104   4                              }
+ 105   3                              else
+ 106   3                              {
+ 107   4                                      TH0 = HighRH2;                          
+ 108   4                                      TL0 = HighRL2;
+ 109   4                                      count2++;
+ 110   4                              }
+ 111   3                              
+ 112   3                      }
+ 113   2                      else
+ 114   2                      {
+ 115   3                              if(count2 == 10)
+ 116   3                              {
+C51 COMPILER V9.54   MAIN                                                                  12/02/2024 15:55:47 PAGE 3   
+
+ 117   4                                      count2 = 0;
+ 118   4                                      TH0 = HighRH2;                          
+ 119   4                                      TL0 = HighRL2;
+ 120   4                                      PWMOUT2 = 1;
+ 121   4                              }
+ 122   3                              else
+ 123   3                              {
+ 124   4                                      TH0 = LowRH2;                           
+ 125   4                                      TL0 = LowRL2;
+ 126   4                                      count2++;
+ 127   4                              }
+ 128   3                      }       
+ 129   2              }
+ 130   1      }
+ 131          
+ 132          void pwm(uchar fr1, DC1, fr2, DC2)
+ 133          {
+ 134   1              uint high1, low1, highload1, lowload1;
+ 135   1              uint high2, low2, highload2, lowload2;
+ 136   1              unsigned long tmp1, tmp2;
+ 137   1              
+ 138   1              tmp1 = (921600) / fr1;                          //周期 11059200 / 12
+ 139   1              tmp2 = (921600) / fr2;                          //周期 11059200 / 12
+ 140   1              if(fr1 == 10 && DC1 == 80)
+ 141   1              {
+ 142   2                      tmp1 /= 10;     
+ 143   2                      mood1 = 1;
+ 144   2              }
+ 145   1              else if(fr1 == 10 && DC1 == 90)
+ 146   1              {
+ 147   2                      tmp1 /= 10;     
+ 148   2                      mood1 = 1;
+ 149   2              }
+ 150   1              else mood1 = 0;
+ 151   1              if(fr2 == 10 && DC2 == 80)
+ 152   1              {
+ 153   2                      tmp2 /= 10;     
+ 154   2                      mood2 = 1;
+ 155   2              }
+ 156   1              else if(fr2 == 10 && DC2 == 90)
+ 157   1              {
+ 158   2                      tmp2 /= 10;     
+ 159   2                      mood2 = 1;
+ 160   2              }
+ 161   1              else mood2 = 0;
+ 162   1              high1 = (tmp1 * DC1) / 100;
+ 163   1              low1 = tmp1 - high1;
+ 164   1              highload1 = 65536 - high1 + 40;
+ 165   1              lowload1 = 65536 - low1 + 40;
+ 166   1              
+ 167   1              HighRH1 = (uchar)(highload1 / 256);
+ 168   1              HighRL1 = (uchar)(highload1 % 256);
+ 169   1              LowRH1 = (uchar)(lowload1 / 256);
+ 170   1              LowRL1 = (uchar)(lowload1 % 256);
+ 171   1              
+ 172   1              
+ 173   1              high2 = (tmp2 * DC2) / 100;
+ 174   1              low2 = tmp2 - high2;
+ 175   1              highload2 = 65536 - high2 + 11;
+ 176   1              lowload2 = 65536 - low2 + 11;
+ 177   1              
+ 178   1              HighRH2 = (uchar)(highload2 / 256);
+C51 COMPILER V9.54   MAIN                                                                  12/02/2024 15:55:47 PAGE 4   
+
+ 179   1              HighRL2 = (uchar)(highload2 % 256);
+ 180   1              LowRH2 = (uchar)(lowload2 / 256);
+ 181   1              LowRL2 = (uchar)(lowload2 % 256);
+ 182   1              
+ 183   1              TMOD &= 0x00;                   //设置定时器模式
+ 184   1              TMOD |= 0x11;                   //设置定时器模式
+ 185   1              TH0 = HighRH1;                          //设置定时初始值
+ 186   1              TL0 = HighRL1;                          //设置定时初始值
+ 187   1              TL1 = HighRL2;                          //设置定时初始值
+ 188   1              TH1 = HighRH2;                          //设置定时初始值
+ 189   1              TR0 = 1;                                //定时器0开始计时
+ 190   1              ET0 = 1;                                //使能定时器0中断
+ 191   1              TR1 = 1;                                //定时器1开始计时
+ 192   1              ET1 = 1;                                //使能定时器1中断
+ 193   1              
+ 194   1              PWMOUT1 = 1;
+ 195   1              PWMOUT2 = 1;
+ 196   1      }
+ 197          
+ 198          void Nixie(unsigned char Location,Number)                       //数码管显示
+ 199          {
+ 200   1              switch(Location)
+ 201   1              {
+ 202   2                      case 1:P2_4=1;P2_3=1;P2_2=1;break;
+ 203   2                      case 2:P2_4=1;P2_3=1;P2_2=0;break;
+ 204   2                      case 3:P2_4=1;P2_3=0;P2_2=1;break;
+ 205   2                      case 4:P2_4=1;P2_3=0;P2_2=0;break;
+ 206   2                      case 5:P2_4=0;P2_3=1;P2_2=1;break;
+ 207   2                      case 6:P2_4=0;P2_3=1;P2_2=0;break;
+ 208   2                      case 7:P2_4=0;P2_3=0;P2_2=1;break;
+ 209   2                      case 8:P2_4=0;P2_3=0;P2_2=0;break;
+ 210   2              }
+ 211   1              P0=led_code[Number];
+ 212   1              Delay(1); 
+ 213   1              P0=0x00;
+ 214   1      }
+ 215          
+ 216          void main()
+ 217          {
+ 218   1              EA = 1;
+ 219   1              f1 = 10;
+ 220   1              DR1 = 50;
+ 221   1              f2 = 10;
+ 222   1              DR2 = 50;
+ 223   1              pwm(f1, DR1, f2, DR2);
+ 224   1              QS = f1;                                                                                                                        
+ 225   1              HS = DR1;
+ 226   1              while(1)
+ 227   1              {
+ 228   2                      temp1 = QS;
+ 229   2                      temp2 = HS;
+ 230   2                      for(i = 0; i < length; i++)                                                                     //前两位显示
+ 231   2                      {
+ 232   3                              display1[length - i - 1] = temp1 % 10;
+ 233   3                              temp1 /= 10;
+ 234   3                              Nixie(i + 1, display1[i]);
+ 235   3                      }
+ 236   2                      for(i = 0; i < length; i++)                                                                     //后两位显示
+ 237   2                      {
+ 238   3                              display2[length - i - 1] = temp2 % 10;
+ 239   3                              temp2 /= 10;
+ 240   3                              Nixie(i + 3, display2[i]);
+C51 COMPILER V9.54   MAIN                                                                  12/02/2024 15:55:47 PAGE 5   
+
+ 241   3                      }
+ 242   2                      Nixie(8,state);
+ 243   2                      if(P3_1 == 0 && flag1 == 0)                                     //独1                                                                                   
+ 244   2                      {
+ 245   3                              High1++;
+ 246   3                              if(High1 >= 1)
+ 247   3                              {
+ 248   4                                      High1 = 0;
+ 249   4                                      flag1 = 1;
+ 250   4                              }
+ 251   3                      }
+ 252   2                      else if(P3_1 != 0 && flag1 == 1)
+ 253   2                      {
+ 254   3                              Low1++;
+ 255   3                              if(Low1 >= 1)
+ 256   3                              {
+ 257   4                                      state++;
+ 258   4                                      if(state == 3) state = 1;
+ 259   4                                      flag1 = 0;
+ 260   4                              }
+ 261   3                      }
+ 262   2                      switch(state)
+ 263   2                      {
+ 264   3                              case 1:
+ 265   3                              {
+ 266   4                                      QS = f1;                                                                                                                        
+ 267   4                                      HS = DR1;
+ 268   4                                      switch(key_multi())                                                                                                     //单双击 长摁
+ 269   4                                      {
+ 270   5                                              case 21:                                                                                                                //独2单击
+ 271   5                                              {
+ 272   6                                                      f1 += 10;
+ 273   6                                                      if(f1 > 50) f1 = 50;
+ 274   6                                                      pwm(f1, DR1, f2, DR2);
+ 275   6                                              }break;
+ 276   5                                              case 22:                                                                                                                //独2双击
+ 277   5                                              {
+ 278   6                                                      f1 -= 10;
+ 279   6                                                      if(f1 < 10) f1 = 10;
+ 280   6                                                      pwm(f1, DR1, f2, DR2);
+ 281   6                                              }break;
+ 282   5                                              case 31:                                                                                                                //独3单击
+ 283   5                                              {
+ 284   6                                                      DR1 += 10;
+ 285   6                                                      if(DR1 > 90) DR1 = 90;
+ 286   6                                                      pwm(f1, DR1, f2, DR2);
+ 287   6                                              }break;
+ 288   5                                              case 32:                                                                                                                //独3双击
+ 289   5                                              {
+ 290   6                                                      DR1 -= 10;
+ 291   6                                                      if(DR1 < 10) DR1 = 10;
+ 292   6                                                      pwm(f1, DR1, f2, DR2);
+ 293   6                                              }break;
+ 294   5                                      }
+ 295   4                              }break;
+ 296   3                              case 2 :
+ 297   3                              {
+ 298   4                                      QS = f2;                                                                                                                        
+ 299   4                                      HS = DR2;
+ 300   4                                      switch(key_multi())                                                                                                     //单双击 长摁
+ 301   4                                      {
+ 302   5                                              case 21:                                                                                                                //独2单击
+C51 COMPILER V9.54   MAIN                                                                  12/02/2024 15:55:47 PAGE 6   
+
+ 303   5                                              {
+ 304   6                                                      f2 += 10;
+ 305   6                                                      if(f2 > 50) f2 = 50;
+ 306   6                                                      pwm(f1, DR1, f2, DR2);
+ 307   6                                              }break;
+ 308   5                                              case 22:                                                                                                                //独2双击
+ 309   5                                              {
+ 310   6                                                      f2 -= 10;
+ 311   6                                                      if(f2 < 10) f2 = 10;
+ 312   6                                                      pwm(f1, DR1, f2, DR2);
+ 313   6                                              }break;
+ 314   5                                              case 31:                                                                                                                //独3单击
+ 315   5                                              {
+ 316   6                                                      DR2 += 10;
+ 317   6                                                      if(DR2 > 90) DR2 = 90;
+ 318   6                                                      pwm(f1, DR1, f2, DR2);
+ 319   6                                              }break;
+ 320   5                                              case 32:                                                                                                                //独3双击
+ 321   5                                              {
+ 322   6                                                      DR2 -= 10;
+ 323   6                                                      if(DR2 < 10) DR2 = 10;
+ 324   6                                                      pwm(f1, DR1, f2, DR2);
+ 325   6                                              }break;
+ 326   5                                      }
+ 327   4                              }break;
+ 328   3                      }
+ 329   2                      
+ 330   2                      P1=0xFF;
+ 331   2                      P1_3=0;
+ 332   2                      if(P1_6==0 && flag3 == 0)                                       //5键存数据                                                                                     
+ 333   2                      {
+ 334   3                              High3++;
+ 335   3                              if(High3 >= 1)
+ 336   3                              {
+ 337   4                                      High3 = 0;
+ 338   4                                      flag3 = 1;
+ 339   4                              }
+ 340   3                      }
+ 341   2                      else if(P1_6!=0 && flag3 == 1)
+ 342   2                      {
+ 343   3                              Low3++;
+ 344   3                              if(Low3 >= 1)
+ 345   3                              {
+ 346   4                                      AT24C02_WriteByte(0,f1);
+ 347   4                                      Delay(5);
+ 348   4                                      AT24C02_WriteByte(1,DR1);
+ 349   4                                      Delay(5);
+ 350   4                                      AT24C02_WriteByte(2,f2);
+ 351   4                                      Delay(5);
+ 352   4                                      AT24C02_WriteByte(3,DR2);
+ 353   4                                      Delay(5);
+ 354   4                                      flag3 = 0;
+ 355   4                              }
+ 356   3                      }
+ 357   2                      
+ 358   2                      P1=0xFF;
+ 359   2                      P1_0=0;
+ 360   2                      if(P1_6==0 && flag4 == 0)                                       //8键读数据                                                                                     
+ 361   2                      {
+ 362   3                              High4++;
+ 363   3                              if(High4 >= 1)
+ 364   3                              {
+C51 COMPILER V9.54   MAIN                                                                  12/02/2024 15:55:47 PAGE 7   
+
+ 365   4                                      High4 = 0;
+ 366   4                                      flag4 = 1;
+ 367   4                              }
+ 368   3                      }
+ 369   2                      else if(P1_6!=0 && flag4 == 1)
+ 370   2                      {
+ 371   3                              Low4++;
+ 372   3                              if(Low4 >= 1)
+ 373   3                              {
+ 374   4                                      f1 = AT24C02_ReadByte(0);
+ 375   4                                      DR1 = AT24C02_ReadByte(1);
+ 376   4                                      f2 = AT24C02_ReadByte(2);
+ 377   4                                      DR2 = AT24C02_ReadByte(3);
+ 378   4                                      pwm(f1, DR1, f2, DR2);
+ 379   4                                      flag4 = 0;
+ 380   4                              }
+ 381   3                      }
+ 382   2                      
+ 383   2                      Delay(10);
+ 384   2              }
+ 385   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1355    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     55      15
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
