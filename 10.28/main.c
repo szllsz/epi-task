@@ -13,7 +13,7 @@
 sbit PWMOUT = P2^0;
 sbit PWMOUT2 = P2^7;
 
-uchar f,DR,i,state,Loc,Num,t,p,count1,count2 = 20;									//f£ºÆµÂÊ  DR£ºÕ¼¿Õ±È
+uchar f,DR,i,state,Loc,Num,t,p,count1,count2 = 20;									//fï¼šé¢‘ç‡  DRï¼šå ç©ºæ¯”
 uchar flag1,flag2,flag3,flag4,flag5,High1,High2,High3,High4,High5,Low1,Low2,Low3,Low4,Low5;
 uchar display1[length],display2[length],str[10];
 uchar HighRH,HighRL,LowRH,LowRL;
@@ -83,8 +83,8 @@ void pwm(uchar fr, DC)
 	uint high, low, highload, lowload;
 	unsigned long tmp;
 	
-	tmp = (921600) / fr;				//ÖÜÆÚ 1105920 / 12
-	tmp /= 100;							//½«ÖÜÆÚ·Ö³ÉÒ»°Ù·İ ·½±ã¼ÆËãÏàÎ»²î
+	tmp = (921600) / fr;				//å‘¨æœŸ 1105920 / 12
+	tmp /= 100;							//å°†å‘¨æœŸåˆ†æˆä¸€ç™¾ä»½ æ–¹ä¾¿è®¡ç®—ç›¸ä½å·®
 	high = (tmp * DC) / 100;
 	low = tmp - high;
 	highload = 65536 - high + 11;
@@ -96,20 +96,20 @@ void pwm(uchar fr, DC)
 	LowRL = (uchar)(lowload % 256);
 	
 	
-	TMOD &= 0xF0;			//ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
-	TMOD |= 0x01;			//ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
-	TH0 = HighRH;				//ÉèÖÃ¶¨Ê±³õÊ¼Öµ
-	TL0 = HighRL;				//ÉèÖÃ¶¨Ê±³õÊ¼Öµ
-	TR0 = 1;				//¶¨Ê±Æ÷0¿ªÊ¼¼ÆÊ±
-	ET0 = 1;				//Ê¹ÄÜ¶¨Ê±Æ÷0ÖĞ¶Ï
-	EA = 1;					//¿ªÆô×ÜÖĞ¶Ï
+	TMOD &= 0xF0;			//è®¾ç½®å®šæ—¶å™¨æ¨¡å¼
+	TMOD |= 0x01;			//è®¾ç½®å®šæ—¶å™¨æ¨¡å¼
+	TH0 = HighRH;				//è®¾ç½®å®šæ—¶åˆå§‹å€¼
+	TL0 = HighRL;				//è®¾ç½®å®šæ—¶åˆå§‹å€¼
+	TR0 = 1;				//å®šæ—¶å™¨0å¼€å§‹è®¡æ—¶
+	ET0 = 1;				//ä½¿èƒ½å®šæ—¶å™¨0ä¸­æ–­
+	EA = 1;					//å¼€å¯æ€»ä¸­æ–­
 	
 	PWMOUT = 1;
 
 	PWMOUT2 = 1;
 }
 
-void Nixie(unsigned char Location,Number)			//ÊıÂë¹ÜÏÔÊ¾
+void Nixie(unsigned char Location,Number)			//æ•°ç ç®¡æ˜¾ç¤º
 {
 	switch(Location)
 	{
@@ -195,26 +195,26 @@ void main()
 	{
 		temp1 = QS;
 		temp2 = HS;
-		for(i = 0; i < length; i++)									//Ç°ËÄÎ»ÏÔÊ¾
+		for(i = 0; i < length; i++)									//å‰å››ä½æ˜¾ç¤º
 		{
 			display1[length - i - 1] = temp1 % 10;
 			temp1 /= 10;
 			Nixie(i + 1, display1[i]);
 		}
 		
-		for(i = 0; i < length; i++)									//ºóËÄÎ»ÏÔÊ¾
+		for(i = 0; i < length; i++)									//åå››ä½æ˜¾ç¤º
 		{
 			display2[length - i - 1] = temp2 % 10;
 			temp2 /= 10;
 			Nixie(i + 5, display2[i]);
 		}
-		if(QS == 1111)		//Ä£Ê½Ò»
+		if(QS == 1111)		//æ¨¡å¼ä¸€
 		{
 			HS = f;
 			
 			P1=0xFF;
 			P1_3=0;
-			if(P1_7==0 && flag1 == 0)					//1¼ü											//1¼ü
+			if(P1_7==0 && flag1 == 0)					//1é”®											
 			{
 				High1++;
 				if(High1 >= 1)
@@ -237,7 +237,7 @@ void main()
 			
 			P1=0xFF;
 			P1_0=0;
-			if(P1_7==0 && flag2 == 0)							//4¼ü									//1¼ü
+			if(P1_7==0 && flag2 == 0)							//4é”®								
 			{
 				High2++;
 				if(High2 >= 1)
@@ -264,7 +264,7 @@ void main()
 			
 			P1=0xFF;
 			P1_3=0;
-			if(P1_7==0 && flag1 == 0)																//1¼ü
+			if(P1_7==0 && flag1 == 0)									//1é”®
 			{
 				High1++;
 				if(High1 >= 1)
@@ -286,7 +286,7 @@ void main()
 			}
 			P1=0xFF;
 			P1_0=0;
-			if(P1_7==0 && flag2 == 0)																//1¼ü
+			if(P1_7==0 && flag2 == 0)									//4é”®
 			{
 				High2++;
 				if(High2 >= 1)
@@ -313,19 +313,19 @@ void main()
 			HS = DR;
 		}
 		
-		switch(key_multi())													//µ¥Ë«»÷ ³¤Şô
+		switch(key_multi())													//å•åŒå‡» é•¿æ‘
 		{
-			case 41:														//µ¥»÷
+			case 41:														//å•å‡»
 			{
 				QS = 1111;
 				HS = f;
 			}break;
-			case 42:														//Ë«»÷
+			case 42:														//åŒå‡»
 			{
 				QS = 2222;
 				HS = DR;
 			}break;
-			case 43:														//³¤Şô
+			case 43:														//é•¿æ‘
 			{
 				QS = f;
 				HS = DR;
@@ -334,7 +334,7 @@ void main()
 		
 		P1=0xFF;
 		P1_3=0;
-		if(P1_6==0 && flag3 == 0)					//5¼ü´æÊı¾İ											//1¼ü
+		if(P1_6==0 && flag3 == 0)					//5é”®å­˜æ•°æ®											
 		{
 			High3++;
 			if(High3 >= 1)
@@ -357,7 +357,7 @@ void main()
 		}
 		P1=0xFF;
 		P1_0=0;
-		if(P1_6==0 && flag4 == 0)					//8¼ü¶ÁÊı¾İ											//1¼ü
+		if(P1_6==0 && flag4 == 0)					//8é”®è¯»æ•°æ®											
 		{
 			High4++;
 			if(High4 >= 1)
@@ -382,7 +382,7 @@ void main()
 		
 		P1=0xFF;
 		P1_0=0;
-		if(P1_4==0 && flag5 == 0)							//16¼ü·¢ËÍ´®¿Ú											//1¼ü
+		if(P1_4==0 && flag5 == 0)							//16é”®å‘é€ä¸²å£											//1é”®
 		{
 			High5++;
 			if(High5 >= 1)
